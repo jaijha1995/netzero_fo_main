@@ -3,9 +3,9 @@
 // export const API_MEDIA_BASE_URL = 'https://api.netzerojourney.org';
 // export const API_SOCKET_BASE_URL = 'https://api.netzerojourney.org';
 
-export const API_BASE_URL = 'http://localhost:8002/api';
-export const API_MEDIA_BASE_URL = 'http://localhost:8002/';
-export const API_SOCKET_BASE_URL = 'http://localhost:8002/';
+export const API_BASE_URL = 'https://api.netzerojourney.org/api';
+export const API_MEDIA_BASE_URL = 'https://api.netzerojourney.org';
+export const API_SOCKET_BASE_URL = 'https://api.netzerojourney.org';
 
 // Other configuration constants can be added here
 export const APP_NAME = 'NetZero';
