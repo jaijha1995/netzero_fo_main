@@ -741,24 +741,30 @@ const EnvironmentForm = () => {
             case 'renewableEnergy':
                 return (
                     <div className="space-y-4">
-                        {/* 🔌 Electrical System Details */}
+                        {/* 🔌 Total Energy Consumption */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700">
                                 Total Energy Consumption
                             </label>
-                            <input
-                                type="text"
-                                value={sectionData.electrical || ''}
-                                onChange={(e) => {
-                                    // Allow only letters, numbers, and spaces
-                                    const value = e.target.value.replace(/[^A-Za-z0-9\s]/g, '');
-                                    handleChange('renewableEnergy', 'electrical', value);
-                                }}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm 
-                                        focus:border-green-500 focus:ring-green-500 border p-2"
-                                placeholder="Enter electrical system details"
-                                disabled={view}
-                            />
+                            <div className="relative mt-1">
+                                <input
+                                    type="text"
+                                    value={sectionData.electrical || ''}
+                                    onChange={(e) => {
+                                        // Allow only letters, numbers, and spaces
+                                        const value = e.target.value.replace(/[^A-Za-z0-9\s]/g, '');
+                                        handleChange('renewableEnergy', 'electrical', value);
+                                    }}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm 
+                                            focus:border-green-500 focus:ring-green-500 border p-2 pr-24"
+                                    placeholder="Enter total energy consumption"
+                                    disabled={view}
+                                />
+                                {/* Unit label */}
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <span className="text-gray-500 sm:text-sm">kWh/month</span>
+                                </div>
+                            </div>
                         </div>
 
                         {/* ⚡ Renewable Energy Consumption */}
@@ -778,6 +784,7 @@ const EnvironmentForm = () => {
                                     placeholder="Enter renewable energy consumption"
                                     disabled={view}
                                 />
+                                {/* Unit label */}
                                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                     <span className="text-gray-500 sm:text-sm">kWh/month</span>
                                 </div>
@@ -794,6 +801,7 @@ const EnvironmentForm = () => {
                         )}
                     </div>
                 );
+
 
 
                 
