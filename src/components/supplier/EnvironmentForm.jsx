@@ -10,55 +10,55 @@ const EnvironmentForm = () => {
     const [view, setView] = useState(location.search.includes('view=true'));
     const [formData, setFormData] = useState({
         renewableEnergy: {
-            value: '',  // kWh/month or percentage
-            electrical:'',
+            value: null,  // kWh/month or percentage
+            electrical:null,
             certificate: null,
             points: 0,
-            remarks: '',
+            remarks: null,
             lastUpdated: new Date()
         },
         waterConsumption: {
-            baseline: '',  // Baseline water consumption
-            targets: '',   // Water reduction targets
-            progress: '',  // Progress towards targets
+            baseline: null,  // Baseline water consumption
+            targets: null,   // Water reduction targets
+            progress: null,  // Progress towards targets
             certificate: null,
             points: 0,
-            remarks: '',
+            remarks: null,
             lastUpdated: new Date()
         },
         rainwaterHarvesting: {
-            volume: '',  // Annual volume in kL/yr
-            rechargeCapacity: '',  // Recharge capacity
-            infrastructure: '',  // Infrastructure details
-            maintenance: '',  // Maintenance process
+            volume: null,  // Annual volume in kL/yr
+            rechargeCapacity: null,  // Recharge capacity
+            infrastructure: null,  // Infrastructure details
+            maintenance: null,  // Maintenance process
             certificate: null,
             points: 0,
-            remarks: '',
+            remarks: null,
             lastUpdated: new Date()
         },
         emissionControl: {
-            chemicalManagement: '',  // Chemical management and disposal methods
+            chemicalManagement: null,  // Chemical management and disposal methods
             chemicalList: [],  // List of chemicals
             disposalMethods: [],  // Disposal methods
-            eiaReports: '',  // Environmental Impact Assessment reports
-            lcaReports: '',  // Life Cycle Assessment reports
+            eiaReports: null,  // Environmental Impact Assessment reports
+            lcaReports: null,  // Life Cycle Assessment reports
             scopeEmissions: {
-                scope1: '',  // Direct emissions
-                scope2: '',  // Indirect emissions from purchased energy
-                scope3: ''   // Other indirect emissions
+                scope1: null,  // Direct emissions
+                scope2: null,  // Indirect emissions from purchased energy
+                scope3: null   // Other indirect emissions
             },
             certificate: null,
             points: 0,
-            remarks: '',
+            remarks: null,
             lastUpdated: new Date()
         },
         resourceConservation: {
-            wasteDiversion: '',  // Percentage of waste diverted
-            packagingMeasures: '',  // Packaging impact measures
+            wasteDiversion: null,  // Percentage of waste diverted
+            packagingMeasures: null,  // Packaging impact measures
             certifications: [],  // Environmental certifications
             certificate: null,
             points: 0,
-            remarks: '',
+            remarks: null,
             lastUpdated: new Date()
         }
     });
@@ -183,39 +183,45 @@ const EnvironmentForm = () => {
 
     const handleChange = (section, field, value) => {
         setFormData(prev => {
+            // Safely convert empty string or undefined to null
+            const safeValue = (value === '' || value === undefined) ? null : value;
+
+            // Ensure section object exists
+            const sectionData = prev[section] || {};
+
             if (field === 'scopeEmissions') {
-                // Special handling for scopeEmissions updates
+                // Handle nested updates safely for scopeEmissions
                 return {
                     ...prev,
                     [section]: {
-                        ...prev[section],
+                        ...sectionData,
                         scopeEmissions: {
-                            ...prev[section].scopeEmissions,
-                            ...value
+                            ...sectionData.scopeEmissions,
+                            ...safeValue
                         },
                         lastUpdated: new Date()
                     }
                 };
             } else {
-                // Normal field updates
+                // Handle normal field updates
                 return {
                     ...prev,
                     [section]: {
-                        ...prev[section],
-                        [field]: value,
+                        ...sectionData,
+                        [field]: safeValue,
                         lastUpdated: new Date()
                     }
                 };
             }
         });
 
-        if (saved[section]) {
-            setSaved(prev => ({
-                ...prev,
-                [section]: false
-            }));
-        }
+        // Safely update 'saved' state
+        setSaved(prev => ({
+            ...prev,
+            [section]: false
+        }));
     };
+
 
     const handleArrayChange = (section, field, value, index) => {
         setFormData(prev => {
@@ -310,31 +316,39 @@ const EnvironmentForm = () => {
         switch (currentSection) {
             // 🌱 Renewable Energy Section
             case 'renewableEnergy':
-                if (!sectionData.electrical || sectionData.electrical.trim() === '') {
-                    toast.error('Please enter electrical system details');
-                    return false;
+                if (
+                    sectionData.electrical === undefined ||
+                    sectionData.electrical === null
+                ) {
+                    // Null or undefined is allowed
+                    break;
                 }
-                if (!sectionData.value || String(sectionData.value).trim() === '') {
-                    toast.error('Please enter renewable energy consumption value');
-                    return false;
+                if (
+                    sectionData.value === undefined ||
+                    sectionData.value === null
+                ) {
+                    // Null or undefined is allowed
+                    break;
                 }
-
                 // if (!sectionData.certificate) {
                 //     toast.error('Please upload renewable energy certificates');
                 //     return false;
                 // }
-
                 break;
 
             // 💧 Water Consumption Section
             case 'waterConsumption':
-                if (!sectionData.baseline || sectionData.baseline.trim() === '') {
-                    toast.error('Please enter baseline water consumption');
-                    return false;
+                if (
+                    sectionData.baseline === undefined ||
+                    sectionData.baseline === null
+                ) {
+                    break;
                 }
-                if (!sectionData.targets || sectionData.targets.trim() === '') {
-                    toast.error('Please describe water reduction targets');
-                    return false;
+                if (
+                    sectionData.targets === undefined ||
+                    sectionData.targets === null
+                ) {
+                    break;
                 }
                 // if (!sectionData.certificate) {
                 //     toast.error('Please upload water consumption documents');
@@ -344,13 +358,17 @@ const EnvironmentForm = () => {
 
             // 🌦 Rainwater Harvesting Section
             case 'rainwaterHarvesting':
-                if (!sectionData.volume || sectionData.volume.trim() === '') {
-                    toast.error('Please enter annual rainwater harvested volume');
-                    return false;
+                if (
+                    sectionData.volume === undefined ||
+                    sectionData.volume === null
+                ) {
+                    break;
                 }
-                if (!sectionData.infrastructure || sectionData.infrastructure.trim() === '') {
-                    toast.error('Please describe harvesting infrastructure');
-                    return false;
+                if (
+                    sectionData.infrastructure === undefined ||
+                    sectionData.infrastructure === null
+                ) {
+                    break;
                 }
                 // if (!sectionData.certificate) {
                 //     toast.error('Please upload rainwater harvesting documents');
@@ -360,25 +378,34 @@ const EnvironmentForm = () => {
 
             // 🌫 Emission Control Section
             case 'emissionControl':
-                if (!sectionData.chemicalManagement || sectionData.chemicalManagement.trim() === '') {
-                    toast.error('Please describe chemical management');
-                    return false;
+                if (
+                    sectionData.chemicalManagement === undefined ||
+                    sectionData.chemicalManagement === null
+                ) {
+                    break;
                 }
-                if (!Array.isArray(sectionData.chemicalList) || sectionData.chemicalList.length === 0) {
-                    toast.error('Please add at least one chemical to the list');
-                    return false;
+                if (
+                    !Array.isArray(sectionData.chemicalList)
+                ) {
+                    break;
                 }
-                if (!sectionData.scopeEmissions.scope1 || sectionData.scopeEmissions.scope1.trim() === '') {
-                    toast.error('Please enter Scope 1 emissions');
-                    return false;
+                if (
+                    sectionData.scopeEmissions?.scope1 === undefined ||
+                    sectionData.scopeEmissions?.scope1 === null
+                ) {
+                    break;
                 }
-                if (!sectionData.scopeEmissions.scope2 || sectionData.scopeEmissions.scope2.trim() === '') {
-                    toast.error('Please enter Scope 2 emissions');
-                    return false;
+                if (
+                    sectionData.scopeEmissions?.scope2 === undefined ||
+                    sectionData.scopeEmissions?.scope2 === null
+                ) {
+                    break;
                 }
-                if (!sectionData.scopeEmissions.scope3 || sectionData.scopeEmissions.scope3.trim() === '') {
-                    toast.error('Please enter Scope 3 emissions');
-                    return false;
+                if (
+                    sectionData.scopeEmissions?.scope3 === undefined ||
+                    sectionData.scopeEmissions?.scope3 === null
+                ) {
+                    break;
                 }
                 // if (!sectionData.certificate) {
                 //     toast.error('Please upload emission control documents');
@@ -388,13 +415,17 @@ const EnvironmentForm = () => {
 
             // ♻️ Resource Conservation Section
             case 'resourceConservation':
-                if (!sectionData.wasteDiversion || sectionData.wasteDiversion.trim() === '') {
-                    toast.error('Please enter waste diversion percentage');
-                    return false;
+                if (
+                    sectionData.wasteDiversion === undefined ||
+                    sectionData.wasteDiversion === null
+                ) {
+                    break;
                 }
-                if (!sectionData.packagingMeasures || sectionData.packagingMeasures.trim() === '') {
-                    toast.error('Please describe packaging impact measures');
-                    return false;
+                if (
+                    sectionData.packagingMeasures === undefined ||
+                    sectionData.packagingMeasures === null
+                ) {
+                    break;
                 }
                 // if (!sectionData.certificate) {
                 //     toast.error('Please upload resource conservation documents');
@@ -408,6 +439,7 @@ const EnvironmentForm = () => {
 
         return true;
     };
+
 
 
     // Update the saveCurrentSection function to validate before saving
@@ -954,13 +986,13 @@ const EnvironmentForm = () => {
 
                         {/* Scope Emissions Section */}
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900 mb-4">Scope Emissions <span className="text-red-500">*</span></h3>
+                            <h3 className="text-lg font-medium text-gray-900 mb-4">Scope Emissions </h3>
                             <p className="text-sm text-gray-600 mb-4">All scope emissions fields are required. Please enter values in metric tonnes of CO2 equivalent (tCO2e).</p>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Scope 1 */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">
-                                        Scope 1 Emissions <span className="text-red-500">*</span>
+                                        Scope 1 Emissions 
                                     </label>
                                     <div className="relative mt-1">
                                         <input
@@ -986,7 +1018,7 @@ const EnvironmentForm = () => {
                                 {/* Scope 2 */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">
-                                        Scope 2 Emissions <span className="text-red-500">*</span>
+                                        Scope 2 Emissions 
                                     </label>
                                     <div className="relative mt-1">
                                         <input
@@ -1012,7 +1044,7 @@ const EnvironmentForm = () => {
                                 {/* Scope 3 */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">
-                                        Scope 3 Emissions <span className="text-red-500">*</span>
+                                        Scope 3 Emissions 
                                     </label>
                                     <div className="relative mt-1">
                                         <input

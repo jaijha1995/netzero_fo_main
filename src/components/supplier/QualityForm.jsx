@@ -10,38 +10,38 @@ const QualityForm = () => {
     const [view, setView] = useState(location.search.includes('view=true'));
     const [formData, setFormData] = useState({
         deliveryPerformance: {
-            value: '',
+            value: null,
             certificate: null
         },
         qualityManagement: {
-            value: '',
+            value: null,
             certificate: null,
             points: 0,
-            remarks: ''
+            remarks: null
         },
         processControl: {
-            value: '',
+            value: null,
             certificate: null,
             points: 0,
-            remarks: ''
+            remarks: null
         },
         materialManagement: {
-            value: '',
+            value: null,
             certificate: null,
             points: 0,
-            remarks: ''
+            remarks: null
         },
         maintenanceCalibration: {
-            value: '',
+            value: null,
             certificate: null,
             points: 0,
-            remarks: ''
+            remarks: null
         },
         technologyUpgradation: {
-            value: '',
+            value: null,
             certificate: null,
             points: 0,
-            remarks: ''
+            remarks: null
         }
     });
 
@@ -211,20 +211,19 @@ const QualityForm = () => {
                 sectionKey = 'technologyUpgradation';
                 break;
             default:
-                return true;
+                return true; // No validation needed for other steps
         }
 
-        // Check if the value field is empty
-        if (!formData[sectionKey].value || formData[sectionKey].value.trim() === '') {
-            toast.error(`Please provide details for ${steps[currentStep].label}`);
-            return false;
-        }
+        // 🛡️ Safe access to section data
+        const sectionData = formData?.[sectionKey];
 
-        // Check if certificate is uploaded
-        // if (!formData[sectionKey].certificate) {
-        //     toast.error(`Please upload supporting documents for ${steps[currentStep].label}`);
-        //     return false;
-        // }
+        // ✅ Null-safe value handling
+        const value = sectionData?.value ?? null;
+        const certificate = sectionData?.certificate ?? null;
+
+        // ✅ All fields are optional now
+        // So even if value or certificate is null/empty, validation passes
+        // No toast errors for missing or null data
 
         return true;
     };
@@ -517,7 +516,7 @@ const QualityForm = () => {
                     <div className="space-y-4">
                         <div>
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Is delivery performance monitored and periodically reviewed by management? <span className="text-red-500">*</span>
+                                Is delivery performance monitored and periodically reviewed by management? 
                             </label>
                             <div className="relative">
                                 <input
@@ -550,7 +549,7 @@ const QualityForm = () => {
                     <div className="space-y-4">
                         <div>
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Are quality standards defined and are testing/certification processes in place? <span className="text-red-500">*</span>
+                                Are quality standards defined and are testing/certification processes in place? 
                             </label>
                             <div className="relative">
                                 <input
@@ -583,7 +582,7 @@ const QualityForm = () => {
                     <div className="space-y-4">
                         <div>
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Are SOPs established for critical processes with continuous monitoring and periodic reviews? <span className="text-red-500">*</span>
+                                Are SOPs established for critical processes with continuous monitoring and periodic reviews? 
                             </label>
                             <div className="relative">
                                 <input
@@ -616,7 +615,7 @@ const QualityForm = () => {
                     <div className="space-y-4">
                         <div>
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Is there a plan for optimal inventory control and proper material handling? <span className="text-red-500">*</span>
+                                Is there a plan for optimal inventory control and proper material handling? 
                             </label>
                             <div className="relative">
                                 <input
@@ -648,7 +647,7 @@ const QualityForm = () => {
                     <div className="space-y-4">
                         <div>
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Are preventive maintenance and calibration plans implemented with MTTR/MTBF tracking? <span className="text-red-500">*</span>
+                                Are preventive maintenance and calibration plans implemented with MTTR/MTBF tracking? 
                             </label>
                             <div className="relative">
                                 <input
@@ -681,7 +680,7 @@ const QualityForm = () => {
                     <div className="space-y-4">
                         <div>
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Is there a proactive plan for technology upgrades, including digital tools (IoT, sensors, smart machines)? <span className="text-red-500">*</span>
+                                Is there a proactive plan for technology upgrades, including digital tools (IoT, sensors, smart machines)? 
                             </label>
                             <div className="relative">
                                 <input

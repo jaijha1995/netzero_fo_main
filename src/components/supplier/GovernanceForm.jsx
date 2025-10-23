@@ -16,36 +16,11 @@ const GovernanceForm = () => {
   const location = useLocation();
   const [view, setView] = useState(location.search.includes("view=true"));
   const [formData, setFormData] = useState({
-    governanceStructure: {
-      value: "",
-      certificate: null,
-      points: 0,
-      remarks: "",
-    },
-    policiesCompliance: {
-      value: "",
-      certificate: null,
-      points: 0,
-      remarks: "",
-    },
-    reportingTargets: {
-      value: "",
-      certificate: null,
-      points: 0,
-      remarks: "",
-    },
-    supplierDueDiligence: {
-      value: "",
-      certificate: null,
-      points: 0,
-      remarks: "",
-    },
-    incidentsRemediation: {
-      value: "",
-      certificate: null,
-      points: 0,
-      remarks: "",
-    },
+    governanceStructure: { value: null, certificate: null, points: 0, remarks: null },
+    policiesCompliance: { value: null, certificate: null, points: 0, remarks: null },
+    reportingTargets: { value: null, certificate: null, points: 0, remarks: null },
+    supplierDueDiligence: { value: null, certificate: null, points: 0, remarks: null },
+    incidentsRemediation: { value: null, certificate: null, points: 0, remarks: null },
   });
 
   const steps = [
@@ -75,36 +50,24 @@ const GovernanceForm = () => {
     incidentsRemediation: false,
   });
 
-  // Test API connection when component mounts
+  // Test API connection
   useEffect(() => {
     const testApiConnection = async () => {
       try {
         setLoading(true);
         const response = await esgService.testConnection();
-
-        if (response.success) {
-          console.log("ESG API is accessible and working");
-          setApiReady(true);
-        } else {
-          console.error("ESG API test failed:", response.message);
-          toast.error(
-            "Could not connect to the ESG service. Please try again later."
-          );
-        }
-      } catch (error) {
-        console.error("Error testing API connection:", error);
-        toast.error(
-          "Connection to the ESG service failed. Please check if the backend is running."
-        );
+        if (response.success) setApiReady(true);
+        else toast.error("Could not connect to ESG service.");
+      } catch (err) {
+        toast.error("Connection to ESG service failed.");
       } finally {
         setLoading(false);
       }
     };
-
     testApiConnection();
   }, []);
 
-  // Fetch existing governance data when API is ready
+  // Fetch existing governance data
   useEffect(() => {
     if (!apiReady) return;
 
@@ -112,8 +75,7 @@ const GovernanceForm = () => {
       try {
         setLoading(true);
         const response = await esgService.getESGData();
-        console.log("response", response.data);
-        if (response.success && response.data && response.data.governance) {
+        if (response.success && response.data?.governance) {
           const governanceData = response.data.governance;
           const newFormData = { ...formData };
           const newFileLabels = { ...fileLabels };
@@ -122,16 +84,13 @@ const GovernanceForm = () => {
           Object.keys(newFormData).forEach((key) => {
             if (governanceData[key]) {
               newFormData[key] = {
-                value: governanceData[key].value || "",
-                certificate: governanceData[key].certificate || null,
-                points: governanceData[key].points || 0,
-                remarks: governanceData[key].remarks || "",
+                value: governanceData[key].value ?? null,
+                certificate: governanceData[key].certificate ?? null,
+                points: governanceData[key].points ?? 0,
+                remarks: governanceData[key].remarks ?? null,
               };
-
               if (governanceData[key].certificate) {
-                newFileLabels[key] = governanceData[key].certificate
-                  .split("/")
-                  .pop();
+                newFileLabels[key] = governanceData[key].certificate.split("/").pop();
                 newSaved[key] = true;
               }
             }
@@ -143,193 +102,128 @@ const GovernanceForm = () => {
           toast.success("Governance data loaded successfully");
         }
       } catch (error) {
-        console.error("Error fetching governance data:", error);
-        toast.error(
-          "Failed to load your governance data. Please try again later."
-        );
+        toast.error("Failed to load governance data.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchGovernanceData();
   }, [apiReady]);
 
+  // Handle text input change
   const handleChange = (section, value) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [section]: {
-        ...formData[section],
-        value,
+        ...prev[section],
+        value: value ?? null, // Null-safe
       },
-    });
-    setSaved({
-      ...saved,
-      [section]: false,
-    });
+    }));
+    setSaved((prev) => ({ ...prev, [section]: false }));
   };
 
+  // Handle file input
   const handleFileChange = (section, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFileLabels({
-        ...fileLabels,
-        [section]: file.name,
-      });
-      setFormData({
-        ...formData,
-        [section]: {
-          ...formData[section],
-          certificate: file,
-        },
-      });
-      setSaved({
-        ...saved,
-        [section]: false,
-      });
-    }
+    const file = e.target.files[0] ?? null;
+    setFileLabels((prev) => ({ ...prev, [section]: file?.name || "No file chosen" }));
+    setFormData((prev) => ({
+      ...prev,
+      [section]: { ...prev[section], certificate: file },
+    }));
+    setSaved((prev) => ({ ...prev, [section]: false }));
   };
 
+  // Download certificate
   const handleDownload = async (section) => {
-    console.log("formData[section].certificate", formData[section].certificate);
-    if (formData[section].certificate) {
+    const certificate = formData[section]?.certificate;
+    if (certificate) {
       try {
         setLoading(true);
-        const fileUrl = getMediaUrl(formData[section].certificate);
-        console.log("fileUrl", fileUrl);
-        const filename = formData[section].certificate.split("/").pop();
-
+        const fileUrl = getMediaUrl(certificate);
+        const filename = certificate.split("/").pop();
         const response = await fetch(fileUrl);
-        if (!response.ok) throw new Error("Network response was not ok");
-
         const blob = await response.blob();
-        const blobUrl = window.URL.createObjectURL(blob);
-
         const link = document.createElement("a");
-        link.href = blobUrl;
+        link.href = window.URL.createObjectURL(blob);
         link.download = filename;
-        link.style.display = "none";
         document.body.appendChild(link);
         link.click();
-
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
-
         toast.success("Download started");
-      } catch (error) {
-        console.error("Error downloading file:", error);
-        toast.error("Error downloading file. Please try again.");
+      } catch (err) {
+        toast.error("Error downloading file.");
       } finally {
         setLoading(false);
       }
     }
   };
 
+  // ✅ Validate current step (null is valid)
   const validateCurrentStep = () => {
-    const currentSection = steps[currentStep].id;
-    let sectionKey;
+    const currentSection = steps[currentStep]?.id;
+    const sectionMap = {
+      structure: "governanceStructure",
+      policies: "policiesCompliance",
+      reporting: "reportingTargets",
+      supplier: "supplierDueDiligence",
+      incidents: "incidentsRemediation",
+    };
+    const sectionKey = sectionMap[currentSection];
+    const value = formData?.[sectionKey]?.value ?? null;
 
-    switch (currentSection) {
-      case "structure":
-        sectionKey = "governanceStructure";
-        break;
-      case "policies":
-        sectionKey = "policiesCompliance";
-        break;
-      case "reporting":
-        sectionKey = "reportingTargets";
-        break;
-      case "supplier":
-        sectionKey = "supplierDueDiligence";
-        break;
-      case "incidents":
-        sectionKey = "incidentsRemediation";
-        break;
-      default:
-        return true;
-    }
-
-    // Check if the value field is empty
-    if (
-      !formData[sectionKey].value ||
-      formData[sectionKey].value.trim() === ""
-    ) {
-      toast.error(`Please provide details for ${steps[currentStep].label}`);
+    // Null is valid
+    if (value !== null && String(value).trim() === "") {
+      toast.error(`Please provide valid details for ${steps[currentStep]?.label}`);
       return false;
     }
-
-    // Certificate upload is now optional
     return true;
   };
 
+  // ✅ Validate all steps (null is valid)
   const validateAllSteps = () => {
     const sections = [
-      { key: "governanceStructure", label: "Governance Structure" },
-      { key: "policiesCompliance", label: "Policies & Compliance" },
-      { key: "reportingTargets", label: "Reporting & Targets" },
-      { key: "supplierDueDiligence", label: "Supplier Due Diligence" },
-      { key: "incidentsRemediation", label: "Incidents & Remediation" },
+      "governanceStructure",
+      "policiesCompliance",
+      "reportingTargets",
+      "supplierDueDiligence",
+      "incidentsRemediation",
     ];
-
-    for (const section of sections) {
-      if (
-        !formData[section.key].value ||
-        formData[section.key].value.trim() === ""
-      ) {
-        toast.error(`Please provide details for ${section.label}`);
+    for (const key of sections) {
+      const value = formData?.[key]?.value ?? null;
+      if (value !== null && String(value).trim() === "") {
+        toast.error(`Please provide details for ${key}`);
         return false;
       }
-      // Certificate upload is now optional
     }
-
     return true;
   };
 
   const nextStep = async () => {
     if (currentStep < steps.length - 1) {
-      if (!validateCurrentStep()) {
-        return;
-      }
+      if (!validateCurrentStep()) return;
       await saveCurrentStep();
-      setCurrentStep(currentStep + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
   const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+    if (currentStep > 0) setCurrentStep((prev) => prev - 1);
   };
 
   const saveCurrentStep = async () => {
-    if (!validateCurrentStep()) {
-      return;
-    }
+    if (!validateCurrentStep()) return;
 
     try {
       setLoading(true);
       const currentSection = steps[currentStep].id;
-      let sectionKey;
-
-      switch (currentSection) {
-        case "structure":
-          sectionKey = "governanceStructure";
-          break;
-        case "policies":
-          sectionKey = "policiesCompliance";
-          break;
-        case "reporting":
-          sectionKey = "reportingTargets";
-          break;
-        case "supplier":
-          sectionKey = "supplierDueDiligence";
-          break;
-        case "incidents":
-          sectionKey = "incidentsRemediation";
-          break;
-        default:
-          throw new Error("Unknown section");
-      }
+      const sectionMap = {
+        structure: "governanceStructure",
+        policies: "policiesCompliance",
+        reporting: "reportingTargets",
+        supplier: "supplierDueDiligence",
+        incidents: "incidentsRemediation",
+      };
+      const sectionKey = sectionMap[currentSection];
 
       let certificateUrl = null;
       if (formData[sectionKey].certificate instanceof File) {
@@ -338,36 +232,20 @@ const GovernanceForm = () => {
           "governance",
           sectionKey
         );
-
-        if (uploadResponse.success) {
-          certificateUrl = uploadResponse.data.filePath;
-        }
+        if (uploadResponse.success) certificateUrl = uploadResponse.data.filePath;
       }
 
       const sectionData = {
-        value: formData[sectionKey].value,
+        value: formData[sectionKey].value ?? null,
         certificate: certificateUrl || formData[sectionKey].certificate,
       };
 
-      const response = await esgService.updateESGData(
-        "governance",
-        sectionKey,
-        sectionData
-      );
-
+      const response = await esgService.updateESGData("governance", sectionKey, sectionData);
       if (response.success) {
-        setSaved({
-          ...saved,
-          [sectionKey]: true,
-        });
-        toast.success(
-          `${steps[currentStep].label} information saved successfully`
-        );
-      } else {
-        toast.error(`Failed to save ${steps[currentStep].label} data`);
-      }
-    } catch (error) {
-      console.error("Error saving governance data:", error);
+        setSaved((prev) => ({ ...prev, [sectionKey]: true }));
+        toast.success(`${steps[currentStep].label} information saved successfully`);
+      } else toast.error(`Failed to save ${steps[currentStep].label} data`);
+    } catch (err) {
       toast.error("Error saving data. Please try again.");
     } finally {
       setLoading(false);
@@ -511,7 +389,7 @@ const GovernanceForm = () => {
               <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
                 Do you have a board-level ESG committee or equivalent oversight
                 body? Who is accountable for ESG performance?{" "}
-                <span className="text-red-500">*</span>
+                
               </label>
               <textarea
                 required
@@ -540,7 +418,7 @@ const GovernanceForm = () => {
                 Describe your anti-corruption and anti-bribery policies. Have
                 you conducted any third-party audits or risk assessments? What
                 key compliance policies and procedures do you have in place?{" "}
-                <span className="text-red-500">*</span>
+                
               </label>
               <textarea
                 required
@@ -569,7 +447,7 @@ const GovernanceForm = () => {
                 How often do you report ESG performance to your board and
                 external stakeholders? Which key metrics are included? Have you
                 set any science-based targets (SBTi) or committed to GRI, TCFD,
-                CDP, etc.? <span className="text-red-500">*</span>
+                CDP, etc.? 
               </label>
               <textarea
                 required
@@ -598,7 +476,7 @@ const GovernanceForm = () => {
                 Do you screen your suppliers for ESG risks? Summarize your
                 upstream due-diligence process and corrective-action rates. What
                 IT systems or tools do you use to track and verify ESG data?{" "}
-                <span className="text-red-500">*</span>
+                
               </label>
               <textarea
                 required
@@ -626,7 +504,7 @@ const GovernanceForm = () => {
               <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
                 Have you faced any material ESG non-compliance or controversies
                 in the last 3 years? Describe the issue and your remediation
-                plan. <span className="text-red-500">*</span>
+                plan. 
               </label>
               <textarea
                 required

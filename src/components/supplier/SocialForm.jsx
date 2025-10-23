@@ -10,79 +10,79 @@ const SocialForm = () => {
     const [view, setView] = useState(location.search.includes('view=true'));
     const [formData, setFormData] = useState({
         swachhWorkplace: {
-            sopDetails: '',  // Cleaning and hygiene SOP details
-            workplaceMaintenance: '',  // Workplace maintenance guidelines
+            sopDetails: null,  // Cleaning and hygiene SOP details
+            workplaceMaintenance: null,  // Workplace maintenance guidelines
             certificate: null,
             points: 0,
-            remarks: '',
+            remarks: null,
             lastUpdated: new Date()
         },
         occupationalSafety: {
-            ltifr: '',  // Latest Lost-Time Injury Frequency Rate
+            ltifr: null,  // Latest Lost-Time Injury Frequency Rate
             safetyTraining: {
                 programs: ['Test Program - Basic Safety Training - 1 hour'],  // Adding a test program
-                coverage: '',  // Employee coverage percentage
+                coverage: null,  // Employee coverage percentage
             },
             emergencyResponse: {
-                plan: '',  // Emergency response plan
-                drillFrequency: '',  // Drill frequency
+                plan: null,  // Emergency response plan
+                drillFrequency: null,  // Drill frequency
             },
-            riskAssessment: '',  // H&S risk assessment methods
+            riskAssessment: null,  // H&S risk assessment methods
             healthServices: {
-                facilities: '',  // On-site health facilities
-                checkupFrequency: '',  // Health check-up frequency
+                facilities: null,  // On-site health facilities
+                checkupFrequency: null,  // Health check-up frequency
             },
-            insurance: '',  // Work-related injury insurance
+            insurance: null,  // Work-related injury insurance
             certificate: null,
             points: 0,
-            remarks: '',
+            remarks: null,
             lastUpdated: new Date()
         },
         hrManagement: {
-            humanRightsPolicy: '',  // Human rights policy details
-            supplierCode: '',  // Supplier code of conduct
+            humanRightsPolicy: null,  // Human rights policy details
+            supplierCode: null,  // Supplier code of conduct
             wagesBenefits: {
-                fairWages: '',  // Fair wages implementation
-                benefits: '',  // Benefits details
-                wageAudits: '',  // Wage audit information
+                fairWages: null,  // Fair wages implementation
+                benefits: null,  // Benefits details
+                wageAudits: null,  // Wage audit information
             },
             diversity: {
-                leadershipPercentage: '',  // Women/underrepresented groups in leadership
-                boardPercentage: '',  // Women/underrepresented groups on board
+                leadershipPercentage: null,  // Women/underrepresented groups in leadership
+                boardPercentage: null,  // Women/underrepresented groups on board
             },
             grievanceMechanism: {
-                details: '',  // Grievance mechanism details
+                details: null,  // Grievance mechanism details
                 casesRaised: 0,  // Number of cases raised
-                resolutionOutcomes: '',  // Resolution outcomes
+                resolutionOutcomes: null,  // Resolution outcomes
             },
             trainingDevelopment: {
-                hoursPerEmployee: '',  // Training hours per employee
+                hoursPerEmployee: null , // Training hours per employee
                 keyPrograms: [],  // Key training programs
             },
             certificate: null,
             points: 0,
-            remarks: '',
+            remarks: null,
             lastUpdated: new Date()
         },
         csrSocialResponsibilities: {
             communityInvestment: {
                 initiatives: [],  // Community investment initiatives
-                localHiring: '',  // Local hiring initiatives
+                localHiring: null,  // Local hiring initiatives
             },
             csrProjects: [],  // Initialize as empty array
             employeeOutreach: {
                 programs: [],  // Employee outreach programs
-                participation: '',  // Participation details
-                spend: '',  // Program spend
+                participation: null,  // Participation details
+                spend: null,  // Program spend
             },
             socialOutcomes: {
-                measurement: '',  // How outcomes are measured
-                reporting: '',  // How outcomes are reported
-                feedback: '',  // Community feedback
+                measurement: null,  // How outcomes are measured
+                reporting: null,  // How outcomes are reported
+                feedback: null,  // Community feedback
             },
             certificate: null,
             points: 0,
-            remarks: '',
+            remarks: null,
             lastUpdated: new Date()
         }
     });
@@ -628,161 +628,75 @@ const SocialForm = () => {
         const currentSection = steps[currentStep].id;
         const sectionData = formData[currentSection];
 
+        // If section data does not exist, skip validation
+        if (!sectionData) return true;
+
         switch (currentSection) {
+            // 🧹 Swachh Workplace Section
             case 'swachhWorkplace':
-                if (!sectionData.sopDetails.trim()) {
-                    toast.error('Please provide detailed cleaning and hygiene SOPs');
-                    return false;
-                }
-                if (!sectionData.workplaceMaintenance.trim()) {
-                    toast.error('Please provide workplace maintenance guidelines');
-                    return false;
-                }
-                if (!sectionData.certificate) {
-                    toast.error('Please upload required documents (cleaning SOPs, audit reports, training records)');
-                    return false;
-                }
+                // Allow all null or missing values — skip validation
+                if (sectionData.sopDetails === null || sectionData.sopDetails === undefined) break;
+                if (sectionData.workplaceMaintenance === null || sectionData.workplaceMaintenance === undefined) break;
+                if (sectionData.certificate === null || sectionData.certificate === undefined) break;
                 break;
 
+            // 🦺 Occupational Safety Section
             case 'occupationalSafety':
-                if (!sectionData.ltifr.trim()) {
-                    toast.error('Please provide your latest LTIFR');
-                    return false;
-                }
-                if (sectionData.safetyTraining.programs.length === 0) {
-                    toast.error('Please add at least one safety training program');
-                    // return false;
-                }
-                if (!sectionData.safetyTraining.coverage.trim()) {
-                    toast.error('Please provide employee coverage percentage for safety training');
-                    return false;
-                }
-                if (!sectionData.emergencyResponse.plan.trim()) {
-                    toast.error('Please provide emergency response plan');
-                    return false;
-                }
-                if (!sectionData.emergencyResponse.drillFrequency.trim()) {
-                    toast.error('Please specify drill frequency');
-                    return false;
-                }
-                if (!sectionData.riskAssessment.trim()) {
-                    toast.error('Please describe your risk assessment methods');
-                    return false;
-                }
-                if (!sectionData.healthServices.facilities.trim()) {
-                    toast.error('Please describe on-site health facilities');
-                    return false;
-                }
-                if (!sectionData.insurance.trim()) {
-                    toast.error('Please provide insurance coverage details');
-                    return false;
-                }
-                if (!sectionData.certificate) {
-                    toast.error('Please upload required documents (safety training schedules, LTIFR report, emergency-drill records)');
-                    return false;
-                }
+                if (sectionData.ltifr === null || sectionData.ltifr === undefined) break;
+                if (!sectionData.safetyTraining || !Array.isArray(sectionData.safetyTraining.programs)) break;
+                if (sectionData.safetyTraining.coverage === null || sectionData.safetyTraining.coverage === undefined) break;
+                if (!sectionData.emergencyResponse) break;
+                if (sectionData.emergencyResponse.plan === null || sectionData.emergencyResponse.plan === undefined) break;
+                if (sectionData.emergencyResponse.drillFrequency === null || sectionData.emergencyResponse.drillFrequency === undefined) break;
+                if (sectionData.riskAssessment === null || sectionData.riskAssessment === undefined) break;
+                if (!sectionData.healthServices) break;
+                if (sectionData.healthServices.facilities === null || sectionData.healthServices.facilities === undefined) break;
+                if (sectionData.insurance === null || sectionData.insurance === undefined) break;
+                if (sectionData.certificate === null || sectionData.certificate === undefined) break;
                 break;
 
+            // 👥 HR Management Section
             case 'hrManagement':
-                if (!sectionData.humanRightsPolicy.trim()) {
-                    toast.error('Please provide human rights policy details');
-                    return false;
-                }
-                if (!sectionData.supplierCode.trim()) {
-                    toast.error('Please provide supplier code of conduct');
-                    return false;
-                }
-                if (!sectionData.wagesBenefits.fairWages.trim()) {
-                    toast.error('Please describe fair wages implementation');
-                    return false;
-                }
-                if (!sectionData.wagesBenefits.benefits.trim()) {
-                    toast.error('Please provide benefits details');
-                    return false;
-                }
-                if (!sectionData.diversity.leadershipPercentage.trim()) {
-                    toast.error('Please provide leadership diversity percentage');
-                    return false;
-                }
-                if (!sectionData.diversity.boardPercentage.trim()) {
-                    toast.error('Please provide board diversity percentage');
-                    return false;
-                }
-                if (!sectionData.grievanceMechanism.details.trim()) {
-                    toast.error('Please describe grievance mechanism');
-                    return false;
-                }
-                if (!sectionData.trainingDevelopment.hoursPerEmployee.trim()) {
-                    toast.error('Please provide training hours per employee');
-                    return false;
-                }
-                if (sectionData.trainingDevelopment.keyPrograms.length === 0) {
-                    toast.error('Please add at least one key training program');
-                    // return false;
-                }
-                if (!sectionData.certificate) {
-                    toast.error('Please upload required documents (policy documents, wage-audit summary, diversity dashboard, grievance log, training metrics)');
-                    return false;
-                }
+                if (sectionData.humanRightsPolicy === null || sectionData.humanRightsPolicy === undefined) break;
+                if (sectionData.supplierCode === null || sectionData.supplierCode === undefined) break;
+                if (!sectionData.wagesBenefits) break;
+                if (sectionData.wagesBenefits.fairWages === null || sectionData.wagesBenefits.fairWages === undefined) break;
+                if (sectionData.wagesBenefits.benefits === null || sectionData.wagesBenefits.benefits === undefined) break;
+                if (!sectionData.diversity) break;
+                if (sectionData.diversity.leadershipPercentage === null || sectionData.diversity.leadershipPercentage === undefined) break;
+                if (sectionData.diversity.boardPercentage === null || sectionData.diversity.boardPercentage === undefined) break;
+                if (!sectionData.grievanceMechanism) break;
+                if (sectionData.grievanceMechanism.details === null || sectionData.grievanceMechanism.details === undefined) break;
+                if (!sectionData.trainingDevelopment) break;
+                if (sectionData.trainingDevelopment.hoursPerEmployee === null || sectionData.trainingDevelopment.hoursPerEmployee === undefined) break;
+                if (!Array.isArray(sectionData.trainingDevelopment.keyPrograms)) break;
+                if (sectionData.certificate === null || sectionData.certificate === undefined) break;
                 break;
 
+            // 🤝 CSR & Social Responsibilities Section
             case 'csrSocialResponsibilities':
-                // Validate communityInvestment
-                if (!Array.isArray(sectionData.communityInvestment.initiatives) || sectionData.communityInvestment.initiatives.length === 0) {
-                    toast.error('Please add at least one community investment initiative');
-                    return false;
-                }
-                if (!sectionData.communityInvestment.localHiring.trim()) {
-                    toast.error('Please describe your local hiring initiatives');
-                    return false;
-                }
+                if (!sectionData.communityInvestment) break;
+                if (!Array.isArray(sectionData.communityInvestment.initiatives)) break;
+                if (sectionData.communityInvestment.localHiring === null || sectionData.communityInvestment.localHiring === undefined) break;
 
-                // Validate csrProjects
-                if (!Array.isArray(sectionData.csrProjects) || sectionData.csrProjects.length === 0) {
-                    toast.error('Please add at least one CSR project');
-                    return false;
-                }
+                if (!Array.isArray(sectionData.csrProjects)) break;
 
-                // Check if any CSR project is missing required fields
-                const invalidProjects = sectionData.csrProjects.filter(project =>
-                    !project ||
-                    !project.name ||
-                    !project.description ||
-                    !project.impact
-                );
+                if (!Array.isArray(sectionData.employeeOutreach?.programs)) break;
+                if (sectionData.employeeOutreach?.participation === null || sectionData.employeeOutreach?.participation === undefined) break;
 
-                if (invalidProjects.length > 0) {
-                    toast.error('Please complete all fields for each CSR project');
-                    return false;
-                }
-
-                // Validate employeeOutreach
-                if (!Array.isArray(sectionData.employeeOutreach.programs) || sectionData.employeeOutreach.programs.length === 0) {
-                    toast.error('Please add at least one employee outreach program');
-                    return false;
-                }
-                if (!sectionData.employeeOutreach.participation.trim()) {
-                    toast.error('Please provide participation details');
-                    return false;
-                }
-
-                // Validate socialOutcomes
-                if (!sectionData.socialOutcomes.measurement.trim()) {
-                    toast.error('Please explain how you measure social outcomes');
-                    return false;
-                }
-                if (!sectionData.certificate) {
-                    toast.error('Please upload required documents (project reports, impact assessments, media coverage)');
-                    return false;
-                }
+                if (sectionData.socialOutcomes?.measurement === null || sectionData.socialOutcomes?.measurement === undefined) break;
+                if (sectionData.certificate === null || sectionData.certificate === undefined) break;
                 break;
 
             default:
+                // Default allows skipping validation for any other sections
                 return true;
         }
 
+        // ✅ Always return true — no blocking validation
         return true;
     };
+
 
     // Add download handler
     const handleDownload = async (section) => {

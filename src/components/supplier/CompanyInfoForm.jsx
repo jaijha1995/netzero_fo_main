@@ -5,20 +5,20 @@ import { toast } from 'react-toastify';
 import { getMediaUrl } from './../../config';
 const CompanyInfoForm = () => {
     const [formData, setFormData] = useState({
-        companyName: '',
-        registrationNumber: '',
-        establishmentYear: '',
-        companyAddress: '',
-        businessType: '',
+        companyName: null,
+        registrationNumber: null,
+        establishmentYear: null,
+        companyAddress: null,
+        businessType: null,
         registrationCertificate: null,
-        rolesDefinedClearly: '',
+        rolesDefinedClearly: null,
         organizationRoles: [
-            { role: '', responsibility: '' }
+            { role: null, responsibility: null }
         ],
         certificates: [
-            { type: '', level: '', validity: '' }
+            { type: null, level: null, validity: null }
         ],
-        remarks: '',
+        remarks: null,
         points: 0
     });
 
@@ -126,17 +126,30 @@ const CompanyInfoForm = () => {
 
 
     const handleCertificateChange = (index, field, value) => {
-        const updatedCertificates = [...formData.certificates];
+        // Ensure certificates array exists and is valid
+        const updatedCertificates = Array.isArray(formData.certificates)
+            ? [...formData.certificates]
+            : [];
+
+        // Ensure the specific index exists
+        if (!updatedCertificates[index]) {
+            updatedCertificates[index] = { type: null, level: null, validity: null };
+        }
+
+        // Safely set the value (null if empty)
         updatedCertificates[index] = {
             ...updatedCertificates[index],
-            [field]: value
+            [field]: value === '' ? null : value  // ✅ convert empty string to null
         };
+
         setFormData({
             ...formData,
             certificates: updatedCertificates
         });
+
         setSaved(false);
     };
+
 
     const addCertificate = () => {
         setFormData({
@@ -188,7 +201,7 @@ const CompanyInfoForm = () => {
     };
 
     const validateBasicInfo = () => {
-        const requiredFields = {
+        const optionalFields = {
             companyName: 'Company Name',
             registrationNumber: 'Registration Number',
             establishmentYear: 'Establishment Year',
@@ -196,20 +209,24 @@ const CompanyInfoForm = () => {
             companyAddress: 'Company Address'
         };
 
-        for (const [field, label] of Object.entries(requiredFields)) {
-            if (!formData[field] || formData[field].trim() === '') {
-                toast.error(`${label} is required`);
-                return false;
+        for (const [field, label] of Object.entries(optionalFields)) {
+            const value = formData[field];
+
+            // This safely checks value but does NOT throw or show error
+            if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) {
+                // Field is null or empty — that’s okay now
+                continue;
             }
         }
 
+        // Registration certificate also optional
         // if (!formData.registrationCertificate) {
-        //     toast.error('Registration Certificate is required');
-        //     return false;
+        //     // optional, so skip
         // }
 
-        return true;
+        return true; // ✅ All good, no fields required
     };
+
 
     const validateLeadershipInfo = () => {
         if (!formData.rolesDefinedClearly) {
@@ -398,7 +415,7 @@ const CompanyInfoForm = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <div>
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Company Name <span className="text-red-500">*</span>
+                                Company Name
                             </label>
                             <input
                                 type="text"
@@ -413,7 +430,7 @@ const CompanyInfoForm = () => {
 
                         <div>
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Registration Number <span className="text-red-500">*</span>
+                                Registration Number 
                             </label>
                             <input
                                 type="number"
@@ -428,7 +445,7 @@ const CompanyInfoForm = () => {
 
                         <div>
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Establishment Year <span className="text-red-500">*</span>
+                                Establishment Year
                             </label>
                             <input
                                 type="date"
@@ -442,7 +459,7 @@ const CompanyInfoForm = () => {
 
                         <div>
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Business Type <span className="text-red-500">*</span>
+                                Business Type
                             </label>
                             <input
                                 type="text"
@@ -457,7 +474,7 @@ const CompanyInfoForm = () => {
 
                         <div className="md:col-span-2">
                             <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                                Company Address <span className="text-red-500">*</span>
+                                Company Address
                             </label>
                             <textarea
                                 name="companyAddress"
@@ -565,7 +582,7 @@ const CompanyInfoForm = () => {
                 return (
                     <div>
                         <label className="block text-gray-700 font-medium mb-1 sm:mb-2">
-                            Are roles and responsibilities clearly defined with an established organogram and regular reviews? <span className="text-red-500">*</span>
+                            Are roles and responsibilities clearly defined with an established organogram and regular reviews?
                         </label>
                         <div className="mt-2 flex flex-wrap items-center space-x-4">
                             <label className="flex items-center mb-2">
@@ -654,7 +671,7 @@ const CompanyInfoForm = () => {
                 return (
                     <div>
                         <p className="text-gray-600 mb-4 text-sm sm:text-base">
-                            What sustainability certifications does your facility hold (e.g., ZED, Green Rating)? <span className="text-red-500">*</span>
+                            What sustainability certifications does your facility hold (e.g., ZED, Green Rating)?
                             Specify the level (Bronze/Silver/Gold) and validity.
                         </p>
 
